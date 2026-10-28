@@ -20,7 +20,7 @@ The platform resolves the fundamental intermittency challenge faced by power uti
 
 * **Live Web Application (Vercel):** [https://xqv9k.vercel.app](https://xqv9k.vercel.app) *(or your deployed Vercel domain)*
 * **Interactive API Documentation:** [https://xqv9k.vercel.app/docs](https://xqv9k.vercel.app/docs) (Swagger UI)
-* **Video Presentation (10-Minute Walkthrough):** [Watch on YouTube](https://youtube.com/watch?v=placeholder)
+* **Video Presentation (10-Minute Walkthrough):** [Watch on YouTube]([https://youtube.com/watch?v=placeholder](https://www.youtube.com/watch?v=Km3UFnvak7w))
   * *Part 1 (0:00 - 5:00):* Utility Client Pitch & ROI Justification
   * *Part 2 (5:00 - 10:00):* Tech Lead Code & Architecture Deep-Dive
 
