@@ -1,0 +1,10 @@
+{
+  "name": "xqv9k",
+  "version": "1.0.0",
+  "private": true,
+  "description": "UK Day-Ahead Wholesale Power & Wind Forecast Risk Terminal",
+  "scripts": {
+    "build": "npm run build --prefix frontend",
+    "dev": "npm run dev --prefix frontend"
+  }
+}
