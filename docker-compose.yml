@@ -1,0 +1,12 @@
+services:
+  terminal:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: xqv9k-terminal:latest
+    container_name: xqv9k_risk_terminal
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
