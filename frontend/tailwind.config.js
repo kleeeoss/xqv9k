@@ -9,18 +9,20 @@ export default {
     extend: {
       colors: {
         obsidian: {
-          950: '#070A11',
-          900: '#0B0F19',
-          800: '#111827',
-          700: '#1F2937',
-          600: '#374151',
+          950: '#070A10',
+          900: '#0C1017',
+          850: '#111622',
+          800: '#161D2B',
+          700: '#222D42',
+          600: '#334155',
         },
         terminal: {
-          cyan: '#06B6D4',
+          cyan: '#38BDF8',
           emerald: '#10B981',
           amber: '#F59E0B',
           rose: '#F43F5E',
-          indigo: '#6366F1',
+          indigo: '#818CF8',
+          slate: '#94A3B8',
         }
       },
       fontFamily: {

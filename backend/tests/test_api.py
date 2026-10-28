@@ -1,9 +1,12 @@
 """Integration tests for FastAPI endpoints."""
 
+from pathlib import Path
 from unittest.mock import patch
 import pytest
 from fastapi.testclient import TestClient
 from backend.main import app
+
+FRONTEND_INDEX_HTML = Path(__file__).resolve().parent.parent.parent / "frontend" / "dist" / "index.html"
 
 
 @pytest.fixture(scope="session")
@@ -142,6 +145,10 @@ def test_live_verify_mocked_offline(client: TestClient):
         assert data["sample_record"]["generation"] == 15538
 
 
+@pytest.mark.skipif(
+    not FRONTEND_INDEX_HTML.exists(),
+    reason="Frontend dist/index.html not compiled yet; verified in docker-smoke and e2e stages",
+)
 def test_spa_root_serves_html(client: TestClient):
     r = client.get("/")
     assert r.status_code == 200

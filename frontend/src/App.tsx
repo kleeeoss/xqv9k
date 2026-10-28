@@ -13,7 +13,7 @@ export const App: React.FC = () => {
   const [evolutionTarget, setEvolutionTarget] = useState<string | null>(null);
 
   return (
-    <div className="min-h-screen bg-obsidian-950 text-slate-100 flex flex-col font-sans selection:bg-cyan-500/20 selection:text-cyan-300">
+    <div className="min-h-screen bg-[#070A10] text-slate-100 flex flex-col font-sans selection:bg-cyan-500/20 selection:text-cyan-300">
       {/* Sticky Global Navigation & Control Header */}
       <HeaderBar
         activeTab={activeTab}
@@ -26,8 +26,8 @@ export const App: React.FC = () => {
         setInterpolation={setInterpolation}
       />
 
-      {/* Main Container */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-6">
+      {/* Main Terminal Workspace */}
+      <main className="flex-1 max-w-[1700px] w-full mx-auto p-3 lg:p-4">
         {activeTab === 'trading' ? (
           <TradingDeskTab
             gateClosure={gateClosure}
@@ -52,10 +52,10 @@ export const App: React.FC = () => {
       />
 
       {/* Terminal Footer */}
-      <footer className="border-t border-obsidian-800 bg-obsidian-950 py-6 px-4 lg:px-6 mt-12 text-xs font-mono text-slate-500">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+      <footer className="border-t border-slate-800/80 bg-[#0B0E14] py-3 px-4 lg:px-5 mt-6 text-xs font-mono text-slate-500">
+        <div className="max-w-[1700px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
           <div className="flex items-center space-x-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-400" />
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
             <span>UK Wholesale Power Desk Terminal | January 2026 Elexon Dataset</span>
           </div>
           <div className="flex items-center space-x-4">

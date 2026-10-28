@@ -40,10 +40,10 @@ interface TradingDeskTabProps {
 }
 
 const PRESETS = [
-  { label: 'Jan 2 Shortfall (+4,335 MW)', date: '2026-01-02', color: 'border-rose-500/40 text-rose-400 bg-rose-500/10' },
-  { label: 'Jan 8 Drought (4,528 MW)', date: '2026-01-08', color: 'border-amber-500/40 text-amber-400 bg-amber-500/10' },
-  { label: 'Jan 27 Storm (17,805 MW)', date: '2026-01-27', color: 'border-cyan-500/40 text-cyan-400 bg-cyan-500/10' },
-  { label: 'Jan 15 Mid-Month', date: '2026-01-15', color: 'border-slate-600 text-slate-300 bg-obsidian-800' },
+  { label: 'Jan 2 Shortfall (+4,335 MW)', date: '2026-01-02', color: 'border-rose-700/60 text-rose-300 bg-rose-950/30' },
+  { label: 'Jan 8 Drought (4,528 MW)', date: '2026-01-08', color: 'border-amber-700/60 text-amber-300 bg-amber-950/30' },
+  { label: 'Jan 27 Storm (17,805 MW)', date: '2026-01-27', color: 'border-cyan-700/60 text-cyan-300 bg-cyan-950/30' },
+  { label: 'Jan 15 Mid-Month', date: '2026-01-15', color: 'border-slate-700 text-slate-300 bg-[#121824]' },
 ];
 
 export const TradingDeskTab: React.FC<TradingDeskTabProps> = ({
@@ -154,31 +154,31 @@ export const TradingDeskTab: React.FC<TradingDeskTabProps> = ({
   }) ?? [];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Interactive Control Panel & Presets */}
-      <div className="rounded-2xl bg-obsidian-900 border border-obsidian-700/80 p-4 lg:p-5 shadow-xl">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+      <div className="rounded-md bg-[#0C1017] border border-slate-800 p-3 lg:p-4 shadow-sm">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
           {/* Month-Locked Date Picker & Presets */}
-          <div className="space-y-2">
-            <label className="text-xs font-mono font-semibold text-slate-400 uppercase tracking-wider flex items-center space-x-1.5">
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-mono font-semibold text-slate-400 uppercase tracking-wider flex items-center space-x-1.5">
               <Calendar className="w-3.5 h-3.5 text-cyan-400" />
               <span>Delivery Date (January 2026 Only)</span>
             </label>
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-wrap items-center gap-1.5">
               <MonthLockedDatePicker
                 value={deliveryDate}
                 onChange={(newDate) => setDeliveryDate(newDate)}
               />
-              <div className="hidden sm:flex items-center space-x-1.5">
+              <div className="hidden sm:flex items-center space-x-1">
                 {PRESETS.map((p) => (
                   <button
                     key={p.date}
                     type="button"
                     onClick={() => setDeliveryDate(p.date)}
-                    className={`px-2.5 py-1 text-xs font-mono rounded-lg border transition-all ${
+                    className={`px-2 py-1 text-xs font-mono rounded-sm border transition-all ${
                       deliveryDate === p.date
-                        ? `${p.color} ring-1 ring-cyan-500/40 font-bold`
-                        : 'border-obsidian-800 text-slate-400 hover:text-slate-200 hover:border-obsidian-700'
+                        ? `${p.color} ring-1 ring-cyan-500 font-bold`
+                        : 'border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700 bg-[#070A10]'
                     }`}
                   >
                     {p.label}
@@ -189,12 +189,12 @@ export const TradingDeskTab: React.FC<TradingDeskTabProps> = ({
           </div>
 
           {/* Confidence Quantile Selector */}
-          <div className="space-y-2">
-            <label className="text-xs font-mono font-semibold text-slate-400 uppercase tracking-wider flex items-center space-x-1.5">
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-mono font-semibold text-slate-400 uppercase tracking-wider flex items-center space-x-1.5">
               <Shield className="w-3.5 h-3.5 text-emerald-400" />
               <span>Firm Wind Shortfall Confidence (P_alpha)</span>
             </label>
-            <div className="flex items-center bg-obsidian-950 border border-obsidian-700 rounded-lg p-1 space-x-1">
+            <div className="flex items-center bg-[#070A10] border border-slate-800 rounded-sm p-0.5 space-x-0.5">
               {[
                 { label: 'P50 (Neutral)', val: 0.50 },
                 { label: 'P75 (Moderate)', val: 0.75 },
@@ -206,9 +206,9 @@ export const TradingDeskTab: React.FC<TradingDeskTabProps> = ({
                   type="button"
                   data-testid={`confidence-btn-${Math.round(opt.val * 100)}`}
                   onClick={() => setConfidenceLevel(opt.val)}
-                  className={`px-2.5 py-1 text-xs font-mono rounded-md transition-all ${
+                  className={`px-2.5 py-1 text-xs font-mono rounded-sm transition-all ${
                     confidenceLevel === opt.val
-                      ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold shadow'
+                      ? 'bg-[#162234] text-emerald-300 border border-emerald-500/50 font-bold shadow-sm'
                       : 'text-slate-400 hover:text-slate-200'
                   }`}
                 >
@@ -219,13 +219,15 @@ export const TradingDeskTab: React.FC<TradingDeskTabProps> = ({
           </div>
 
           {/* Portfolio Demand Slider */}
-          <div className="space-y-2 min-w-[220px]">
+          <div className="space-y-1.5 min-w-[200px]">
             <div className="flex items-center justify-between text-xs font-mono">
-              <span className="text-slate-400 uppercase flex items-center space-x-1">
+              <span className="text-slate-400 text-[10px] uppercase flex items-center space-x-1">
                 <Sliders className="w-3.5 h-3.5 text-indigo-400" />
                 <span>Base Demand</span>
               </span>
-              <span className="font-bold text-indigo-300">{demandMw.toLocaleString()} MW</span>
+              <span className="font-bold text-indigo-300 font-mono tabular-nums">
+                {demandMw.toLocaleString()} MW
+              </span>
             </div>
             <input
               type="range"
@@ -234,35 +236,35 @@ export const TradingDeskTab: React.FC<TradingDeskTabProps> = ({
               step="1000"
               value={demandMw}
               onChange={(e) => setDemandMw(parseFloat(e.target.value))}
-              className="w-full accent-indigo-500 bg-obsidian-950 cursor-pointer"
+              className="w-full accent-indigo-500 bg-[#070A10] cursor-pointer h-1.5 rounded-sm"
             />
           </div>
         </div>
 
         {/* Selected Run Causality Badge Strip */}
         {data && (
-          <div className="mt-4 pt-3 border-t border-obsidian-800/80 flex flex-wrap items-center justify-between gap-2 text-xs font-mono text-slate-400">
+          <div className="mt-3 pt-2.5 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-2 text-xs font-mono text-slate-400">
             <div className="flex items-center space-x-2">
-              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
               <span>
                 Gate Cutoff:{' '}
-                <strong className="text-slate-200">
+                <strong className="text-slate-200 tabular-nums">
                   {data.decision_cutoff_utc.replace('T', ' ').replace(':00Z', ' UTC')}
                 </strong>
               </span>
-              <span className="text-slate-600">|</span>
+              <span className="text-slate-700">|</span>
               <span>
                 Latest Eligible Run:{' '}
-                <strong className="text-cyan-400">
+                <strong className="text-cyan-400 tabular-nums">
                   {data.selected_publish_time_utc.replace('T', ' ').replace(':00Z', ' UTC')}
                 </strong>
               </span>
             </div>
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2">
               <button
                 type="button"
                 onClick={() => setShowActuals(!showActuals)}
-                className="flex items-center space-x-1 text-slate-300 hover:text-white"
+                className="flex items-center space-x-1 px-2 py-0.5 rounded-sm bg-[#070A10] border border-slate-800 text-slate-300 hover:text-white hover:border-slate-700 transition-all text-xs"
                 data-testid="toggle-actuals-btn"
               >
                 {showActuals ? <Eye className="w-3.5 h-3.5 text-amber-400" /> : <EyeOff className="w-3.5 h-3.5 text-slate-500" />}
@@ -271,7 +273,7 @@ export const TradingDeskTab: React.FC<TradingDeskTabProps> = ({
               <button
                 type="button"
                 onClick={handleExportCSV}
-                className="flex items-center space-x-1 px-2.5 py-1 rounded bg-obsidian-950 border border-obsidian-700 text-slate-300 hover:text-white hover:border-slate-500 shadow"
+                className="flex items-center space-x-1 px-2 py-0.5 rounded-sm bg-[#070A10] border border-slate-800 text-slate-300 hover:text-white hover:border-slate-600 shadow-sm transition-all text-xs"
                 data-testid="export-csv-btn"
               >
                 <Download className="w-3.5 h-3.5" />
@@ -284,14 +286,14 @@ export const TradingDeskTab: React.FC<TradingDeskTabProps> = ({
 
       {/* Loading or Error State */}
       {loading && (
-        <div className="p-12 text-center font-mono text-cyan-400 animate-pulse" data-testid="loading-state">
+        <div className="p-8 text-center font-mono text-xs text-cyan-400 animate-pulse" data-testid="loading-state">
           Evaluating Day-Ahead Causality & Shortfall Quantiles...
         </div>
       )}
 
       {error && (
-        <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 flex items-center space-x-2" data-testid="error-state">
-          <AlertTriangle className="w-5 h-5 flex-shrink-0" />
+        <div className="p-3 rounded-md bg-rose-950/40 border border-rose-800/80 text-rose-300 flex items-center space-x-2 text-xs font-mono" data-testid="error-state">
+          <AlertTriangle className="w-4 h-4 flex-shrink-0" />
           <span>{error}</span>
         </div>
       )}
@@ -299,7 +301,7 @@ export const TradingDeskTab: React.FC<TradingDeskTabProps> = ({
       {data && !loading && (
         <>
           {/* KPI Summary Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2.5">
             <MetricCard
               title="Expected Wind"
               value={data.kpis.expected_wind_energy_mwh}
@@ -362,225 +364,230 @@ export const TradingDeskTab: React.FC<TradingDeskTabProps> = ({
             />
           </div>
 
-          {/* Visual 1: Forecast Uncertainty Fan Chart */}
-          <div className="rounded-2xl bg-obsidian-900 border border-obsidian-700/80 p-4 lg:p-5 shadow-xl">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-4 border-b border-obsidian-800 gap-2">
-              <div>
-                <h3 className="text-sm font-bold font-mono text-white uppercase tracking-wider flex items-center space-x-2">
-                  <Wind className="w-4 h-4 text-cyan-400" />
-                  <span>Forecast Uncertainty Fan Chart (Delivery Day {data.delivery_date})</span>
-                </h3>
-                <p className="text-xs text-slate-400 font-sans mt-0.5">
-                  Point-in-Time NGESO Forecast vs Empirical {pLabel} Firm Wind Floor and Actual Outturn
-                </p>
-              </div>
-              <div className="flex items-center space-x-3 text-xs font-mono">
-                <span className="flex items-center space-x-1.5">
-                  <span className="w-3 h-1 bg-cyan-400 rounded-full" />
-                  <span className="text-slate-300">Forecast W_hat</span>
-                </span>
-                <span className="flex items-center space-x-1.5">
-                  <span className="w-3 h-1 bg-emerald-400 rounded-full border border-dashed" />
-                  <span className="text-slate-300">{pLabel} Firm Wind</span>
-                </span>
-                {showActuals && (
-                  <span className="flex items-center space-x-1.5">
-                    <span className="w-3 h-1 bg-amber-400 rounded-full" />
-                    <span className="text-slate-300">Actual Outturn</span>
+          {/* Asymmetric 2-Column Analytical Charts Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {/* Visual 1: Forecast Uncertainty Fan Chart */}
+            <div className="rounded-md bg-[#0C1017] border border-slate-800 p-3.5 shadow-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-2.5 border-b border-slate-800 gap-1.5">
+                <div>
+                  <h3 className="text-xs font-bold font-mono text-white uppercase tracking-wider flex items-center space-x-1.5">
+                    <Wind className="w-3.5 h-3.5 text-cyan-400" />
+                    <span>Forecast Uncertainty Fan Chart (Delivery Day {data.delivery_date})</span>
+                  </h3>
+                  <p className="text-[10px] text-slate-500 font-mono mt-0.5">
+                    Point-in-Time NGESO Forecast vs Empirical {pLabel} Firm Wind Floor and Actual Outturn
+                  </p>
+                </div>
+                <div className="flex items-center space-x-2.5 text-[11px] font-mono">
+                  <span className="flex items-center space-x-1">
+                    <span className="w-2.5 h-0.5 bg-cyan-400" />
+                    <span className="text-slate-300">Forecast W_hat</span>
                   </span>
-                )}
-              </div>
-            </div>
-
-            <div className="h-80 w-full mt-4">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="fanGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#06B6D4" stopOpacity={0.25} />
-                      <stop offset="95%" stopColor="#06B6D4" stopOpacity={0.02} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" vertical={false} />
-                  <XAxis
-                    dataKey="time"
-                    stroke="#6B7280"
-                    tick={{ fill: '#9CA3AF', fontSize: 11, fontFamily: 'monospace' }}
-                    interval={3}
-                  />
-                  <YAxis
-                    stroke="#6B7280"
-                    tick={{ fill: '#9CA3AF', fontSize: 11, fontFamily: 'monospace' }}
-                    domain={['auto', 'auto']}
-                    unit=" MW"
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: '#0B0F19',
-                      borderColor: '#374151',
-                      borderRadius: '0.75rem',
-                      fontFamily: 'monospace',
-                      fontSize: '12px',
-                    }}
-                  />
-                  {/* Uncertainty Prediction Interval Band (stacked on firm wind floor) */}
-                  <Area
-                    type="monotone"
-                    dataKey="firmWind"
-                    stackId="uncertaintyBand"
-                    stroke="none"
-                    fill="transparent"
-                    legendType="none"
-                    tooltipType="none"
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="bandDelta"
-                    stackId="uncertaintyBand"
-                    stroke="none"
-                    fill="#06B6D4"
-                    fillOpacity={0.16}
-                    name="Empirical P10–P90 Prediction Interval"
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="firmWind"
-                    stroke="#10B981"
-                    strokeWidth={2}
-                    strokeDasharray="4 4"
-                    dot={false}
-                    name={`${pLabel} Firm Wind Floor`}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="forecast"
-                    stroke="#06B6D4"
-                    strokeWidth={2.5}
-                    dot={false}
-                    name="Raw Forecast W_hat"
-                  />
+                  <span className="flex items-center space-x-1">
+                    <span className="w-2.5 h-0.5 bg-emerald-400 border border-dashed" />
+                    <span className="text-slate-300">{pLabel} Firm Wind</span>
+                  </span>
                   {showActuals && (
+                    <span className="flex items-center space-x-1">
+                      <span className="w-2.5 h-0.5 bg-amber-400" />
+                      <span className="text-slate-300">Actual Outturn</span>
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <div className="h-72 w-full mt-3">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={chartData} margin={{ top: 8, right: 8, left: -10, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="fanGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#06B6D4" stopOpacity={0.15} />
+                        <stop offset="95%" stopColor="#06B6D4" stopOpacity={0.01} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="2 2" stroke="#1A2234" vertical={false} />
+                    <XAxis
+                      dataKey="time"
+                      stroke="#475569"
+                      tick={{ fill: '#94A3B8', fontSize: 10, fontFamily: 'monospace' }}
+                      interval={3}
+                    />
+                    <YAxis
+                      stroke="#475569"
+                      tick={{ fill: '#94A3B8', fontSize: 10, fontFamily: 'monospace' }}
+                      domain={['auto', 'auto']}
+                      unit=" MW"
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: '#0B0E14',
+                        borderColor: '#334155',
+                        borderRadius: '0.25rem',
+                        fontFamily: 'monospace',
+                        fontSize: '11px',
+                        padding: '6px 10px',
+                      }}
+                    />
+                    {/* Uncertainty Prediction Interval Band */}
+                    <Area
+                      type="monotone"
+                      dataKey="firmWind"
+                      stackId="uncertaintyBand"
+                      stroke="none"
+                      fill="transparent"
+                      legendType="none"
+                      tooltipType="none"
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="bandDelta"
+                      stackId="uncertaintyBand"
+                      stroke="none"
+                      fill="#06B6D4"
+                      fillOpacity={0.12}
+                      name="Empirical P10–P90 Prediction Interval"
+                    />
                     <Line
                       type="monotone"
-                      dataKey="actual"
-                      stroke="#F59E0B"
-                      strokeWidth={2}
-                      dot={{ r: 2, fill: '#F59E0B' }}
-                      name="Actual Outturn (FUELHH)"
+                      dataKey="firmWind"
+                      stroke="#10B981"
+                      strokeWidth={1.5}
+                      strokeDasharray="4 4"
+                      dot={false}
+                      name={`${pLabel} Firm Wind Floor`}
                     />
-                  )}
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-
-          {/* Visual 2: Day-Ahead Thermal Procurement Dispatch (Stacked Area) */}
-          <div className="rounded-2xl bg-obsidian-900 border border-obsidian-700/80 p-4 lg:p-5 shadow-xl">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-4 border-b border-obsidian-800 gap-2">
-              <div>
-                <h3 className="text-sm font-bold font-mono text-white uppercase tracking-wider flex items-center space-x-2">
-                  <Flame className="w-4 h-4 text-rose-400" />
-                  <span>Risk-Adjusted Day-Ahead Thermal Procurement Dispatch</span>
-                </h3>
-                <p className="text-xs text-slate-400 font-sans mt-0.5">
-                  How Expected Consumer Demand is balanced across {pLabel} Firm Wind, Naive Thermal, and Reserve Buffer
-                </p>
-              </div>
-              <div className="flex items-center space-x-3 text-xs font-mono">
-                <span className="flex items-center space-x-1.5">
-                  <span className="w-3 h-2 bg-emerald-500 rounded-sm" />
-                  <span className="text-slate-300">{pLabel} Firm Wind</span>
-                </span>
-                <span className="flex items-center space-x-1.5">
-                  <span className="w-3 h-2 bg-slate-600 rounded-sm" />
-                  <span className="text-slate-300">Base Thermal</span>
-                </span>
-                <span className="flex items-center space-x-1.5">
-                  <span className="w-3 h-2 bg-rose-500 rounded-sm" />
-                  <span className="text-slate-300">Reserve Buffer Delta_P</span>
-                </span>
+                    <Line
+                      type="monotone"
+                      dataKey="forecast"
+                      stroke="#06B6D4"
+                      strokeWidth={1.5}
+                      dot={false}
+                      name="Raw Forecast W_hat"
+                    />
+                    {showActuals && (
+                      <Line
+                        type="monotone"
+                        dataKey="actual"
+                        stroke="#F59E0B"
+                        strokeWidth={1.5}
+                        dot={{ r: 1.5, fill: '#F59E0B' }}
+                        name="Actual Outturn (FUELHH)"
+                      />
+                    )}
+                  </AreaChart>
+                </ResponsiveContainer>
               </div>
             </div>
 
-            <div className="h-80 w-full mt-4">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" vertical={false} />
-                  <XAxis
-                    dataKey="time"
-                    stroke="#6B7280"
-                    tick={{ fill: '#9CA3AF', fontSize: 11, fontFamily: 'monospace' }}
-                    interval={3}
-                  />
-                  <YAxis
-                    stroke="#6B7280"
-                    tick={{ fill: '#9CA3AF', fontSize: 11, fontFamily: 'monospace' }}
-                    unit=" MW"
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: '#0B0F19',
-                      borderColor: '#374151',
-                      borderRadius: '0.75rem',
-                      fontFamily: 'monospace',
-                      fontSize: '12px',
-                    }}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="firmWind"
-                    stackId="1"
-                    stroke="#10B981"
-                    fill="#10B981"
-                    fillOpacity={0.6}
-                    name={`${pLabel} Firm Wind MW`}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="naiveThermal"
-                    stackId="1"
-                    stroke="#475569"
-                    fill="#334155"
-                    fillOpacity={0.8}
-                    name="Base Thermal MW"
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="buffer"
-                    stackId="1"
-                    stroke="#F43F5E"
-                    fill="#F43F5E"
-                    fillOpacity={0.7}
-                    name="Reserve Buffer Delta_P"
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="demand"
-                    stroke="#818CF8"
-                    strokeWidth={2}
-                    dot={false}
-                    name="Total Demand D(t)"
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
+            {/* Visual 2: Day-Ahead Thermal Procurement Dispatch (Stacked Area) */}
+            <div className="rounded-md bg-[#0C1017] border border-slate-800 p-3.5 shadow-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-2.5 border-b border-slate-800 gap-1.5">
+                <div>
+                  <h3 className="text-xs font-bold font-mono text-white uppercase tracking-wider flex items-center space-x-1.5">
+                    <Flame className="w-3.5 h-3.5 text-rose-400" />
+                    <span>Risk-Adjusted Day-Ahead Thermal Procurement Dispatch</span>
+                  </h3>
+                  <p className="text-[10px] text-slate-500 font-mono mt-0.5">
+                    How Expected Consumer Demand is balanced across {pLabel} Firm Wind, Naive Thermal, and Reserve Buffer
+                  </p>
+                </div>
+                <div className="flex items-center space-x-2.5 text-[11px] font-mono">
+                  <span className="flex items-center space-x-1">
+                    <span className="w-2.5 h-1.5 bg-emerald-500 rounded-xs" />
+                    <span className="text-slate-300">{pLabel} Firm Wind</span>
+                  </span>
+                  <span className="flex items-center space-x-1">
+                    <span className="w-2.5 h-1.5 bg-slate-600 rounded-xs" />
+                    <span className="text-slate-300">Base Thermal</span>
+                  </span>
+                  <span className="flex items-center space-x-1">
+                    <span className="w-2.5 h-1.5 bg-rose-500 rounded-xs" />
+                    <span className="text-slate-300">Reserve Buffer Delta_P</span>
+                  </span>
+                </div>
+              </div>
+
+              <div className="h-72 w-full mt-3">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={chartData} margin={{ top: 8, right: 8, left: -10, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="2 2" stroke="#1A2234" vertical={false} />
+                    <XAxis
+                      dataKey="time"
+                      stroke="#475569"
+                      tick={{ fill: '#94A3B8', fontSize: 10, fontFamily: 'monospace' }}
+                      interval={3}
+                    />
+                    <YAxis
+                      stroke="#475569"
+                      tick={{ fill: '#94A3B8', fontSize: 10, fontFamily: 'monospace' }}
+                      unit=" MW"
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: '#0B0E14',
+                        borderColor: '#334155',
+                        borderRadius: '0.25rem',
+                        fontFamily: 'monospace',
+                        fontSize: '11px',
+                        padding: '6px 10px',
+                      }}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="firmWind"
+                      stackId="1"
+                      stroke="#10B981"
+                      fill="#10B981"
+                      fillOpacity={0.45}
+                      name={`${pLabel} Firm Wind MW`}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="naiveThermal"
+                      stackId="1"
+                      stroke="#475569"
+                      fill="#334155"
+                      fillOpacity={0.7}
+                      name="Base Thermal MW"
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="buffer"
+                      stackId="1"
+                      stroke="#F43F5E"
+                      fill="#F43F5E"
+                      fillOpacity={0.65}
+                      name="Reserve Buffer Delta_P"
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="demand"
+                      stroke="#818CF8"
+                      strokeWidth={1.5}
+                      dot={false}
+                      name="Total Demand D(t)"
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
             </div>
           </div>
 
           {/* 48-Period Settlement Schedule Table */}
-          <div className="rounded-2xl bg-obsidian-900 border border-obsidian-700/80 shadow-xl overflow-hidden">
-            <div className="p-4 border-b border-obsidian-800 flex items-center justify-between">
+          <div className="rounded-md bg-[#0C1017] border border-slate-800 shadow-sm overflow-hidden">
+            <div className="p-3 border-b border-slate-800 flex items-center justify-between">
               <div>
-                <h3 className="text-sm font-bold font-mono text-white uppercase tracking-wider">
+                <h3 className="text-xs font-bold font-mono text-white uppercase tracking-wider">
                   48 Settlement Period Procurement Schedule
                 </h3>
-                <p className="text-xs text-slate-400 font-sans mt-0.5">
+                <p className="text-[10px] text-slate-500 font-mono mt-0.5">
                   Settlement breakdown with point-in-time causality, {pLabel} risk buffers, and ex-post outturns
                 </p>
               </div>
               <button
                 type="button"
                 onClick={handleExportCSV}
-                className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 hover:bg-cyan-500/20 text-xs font-mono transition-all"
+                className="flex items-center space-x-1.5 px-2.5 py-1 rounded-sm bg-[#070A10] text-cyan-300 border border-slate-700 hover:border-cyan-500 text-xs font-mono transition-all"
               >
                 <Download className="w-3.5 h-3.5" />
                 <span>Export CSV</span>
@@ -589,67 +596,67 @@ export const TradingDeskTab: React.FC<TradingDeskTabProps> = ({
 
             <div className="overflow-x-auto max-h-96">
               <table className="w-full text-left text-xs font-mono">
-                <thead className="sticky top-0 bg-obsidian-950 text-slate-400 uppercase text-[10px] border-b border-obsidian-800 z-10">
+                <thead className="sticky top-0 bg-[#0B0E14] text-slate-400 uppercase text-[10px] border-b border-slate-800 z-10">
                   <tr>
-                    <th className="px-3 py-2.5">SP</th>
-                    <th className="px-3 py-2.5">Start Time</th>
-                    <th className="px-3 py-2.5 text-right">Forecast (MW)</th>
-                    <th className="px-3 py-2.5 text-right">{pLabel} Firm Wind (MW)</th>
-                    <th className="px-3 py-2.5 text-right">Demand (MW)</th>
-                    <th className="px-3 py-2.5 text-right">Base Thermal</th>
-                    <th className="px-3 py-2.5 text-right">Buffer Delta_P</th>
-                    <th className="px-3 py-2.5 text-right">Rec Thermal</th>
-                    <th className="px-3 py-2.5 text-right">Actual Outturn</th>
-                    <th className="px-3 py-2.5 text-right">Signed Miss</th>
-                    <th className="px-3 py-2.5 text-center">Action</th>
+                    <th className="px-2.5 py-1.5">SP</th>
+                    <th className="px-2.5 py-1.5">Start Time</th>
+                    <th className="px-2.5 py-1.5 text-right">Forecast (MW)</th>
+                    <th className="px-2.5 py-1.5 text-right">{pLabel} Firm Wind (MW)</th>
+                    <th className="px-2.5 py-1.5 text-right">Demand (MW)</th>
+                    <th className="px-2.5 py-1.5 text-right">Base Thermal</th>
+                    <th className="px-2.5 py-1.5 text-right">Buffer Delta_P</th>
+                    <th className="px-2.5 py-1.5 text-right">Rec Thermal</th>
+                    <th className="px-2.5 py-1.5 text-right">Actual Outturn</th>
+                    <th className="px-2.5 py-1.5 text-right">Signed Miss</th>
+                    <th className="px-2.5 py-1.5 text-center">Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-obsidian-800/60 bg-obsidian-900/40">
+                <tbody className="divide-y divide-slate-800/60 bg-[#0C1017]">
                   {data.periods.map((p) => {
                     const isShortfall = (p.signed_error_mw ?? 0) > 1000;
                     return (
                       <tr
                         key={p.settlement_period}
-                        className={`hover:bg-obsidian-800/60 transition-colors ${
-                          isShortfall ? 'bg-rose-500/5' : ''
+                        className={`hover:bg-[#161D2B] transition-colors tabular-nums ${
+                          isShortfall ? 'bg-rose-950/20' : ''
                         }`}
                       >
-                        <td className="px-3 py-2 font-bold text-slate-300">SP {p.settlement_period}</td>
-                        <td className="px-3 py-2 text-slate-400">{p.start_time_utc.slice(11, 16)} UTC</td>
-                        <td className="px-3 py-2 text-right font-semibold text-cyan-400">
+                        <td className="px-2.5 py-1.5 font-bold text-slate-300">SP {p.settlement_period}</td>
+                        <td className="px-2.5 py-1.5 text-slate-400">{p.start_time_utc.slice(11, 16)} UTC</td>
+                        <td className="px-2.5 py-1.5 text-right font-semibold text-cyan-400">
                           {p.forecast_mw.toLocaleString()}
                         </td>
-                        <td className="px-3 py-2 text-right text-emerald-400 font-semibold">
+                        <td className="px-2.5 py-1.5 text-right text-emerald-400 font-semibold">
                           {p.firm_wind_mw.toLocaleString()}
                         </td>
-                        <td className="px-3 py-2 text-right text-indigo-300">
+                        <td className="px-2.5 py-1.5 text-right text-indigo-300">
                           {p.demand_mw.toLocaleString()}
                         </td>
-                        <td className="px-3 py-2 text-right text-slate-400">
+                        <td className="px-2.5 py-1.5 text-right text-slate-400">
                           {p.naive_thermal_mw.toLocaleString()}
                         </td>
-                        <td className="px-3 py-2 text-right text-rose-400 font-semibold">
+                        <td className="px-2.5 py-1.5 text-right text-rose-400 font-semibold">
                           +{p.shortfall_buffer_mw.toLocaleString()}
                         </td>
-                        <td className="px-3 py-2 text-right font-bold text-white">
+                        <td className="px-2.5 py-1.5 text-right font-bold text-white">
                           {p.recommended_thermal_mw.toLocaleString()}
                         </td>
-                        <td className="px-3 py-2 text-right text-amber-400">
+                        <td className="px-2.5 py-1.5 text-right text-amber-400">
                           {p.actual_mw !== null ? p.actual_mw.toLocaleString() : '-'}
                         </td>
                         <td
-                          className={`px-3 py-2 text-right font-semibold ${
+                          className={`px-2.5 py-1.5 text-right font-semibold ${
                             (p.signed_error_mw ?? 0) > 0 ? 'text-rose-400' : 'text-emerald-400'
                           }`}
                         >
                           {p.signed_error_mw !== null ? `${p.signed_error_mw > 0 ? '+' : ''}${p.signed_error_mw.toLocaleString()}` : '-'}
                         </td>
-                        <td className="px-3 py-2 text-center">
+                        <td className="px-2.5 py-1.5 text-center">
                           {onOpenEvolution && (
                             <button
                               type="button"
                               onClick={() => onOpenEvolution(p.start_time_utc)}
-                              className="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20 transition-all border border-cyan-500/30"
+                              className="text-[10px] font-mono px-1.5 py-0.5 rounded-sm bg-[#121824] text-cyan-400 hover:bg-[#1A2234] transition-all border border-slate-700"
                             >
                               Cone
                             </button>

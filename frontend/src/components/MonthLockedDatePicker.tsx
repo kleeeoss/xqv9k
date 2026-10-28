@@ -13,7 +13,7 @@ const DAYS_OF_WEEK = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 // Total days in January: 31.
 const TOTAL_JANUARY_DAYS = 31;
 const PREV_MONTH_PADDING = [28, 29, 30, 31];
-// Total grid cells = 35 (5 rows of 7 = 35). So 35 - 4 - 31 = 0 next-month days! Exactly 5 rows!
+// Total grid cells = 35 (5 rows of 7 = 35). Exactly 5 rows!
 
 export const MonthLockedDatePicker: React.FC<MonthLockedDatePickerProps> = ({
   value,
@@ -65,12 +65,12 @@ export const MonthLockedDatePicker: React.FC<MonthLockedDatePickerProps> = ({
         onClick={() => setIsOpen(!isOpen)}
         aria-label="Select Delivery Date (Locked to January 2026)"
         aria-expanded={isOpen}
-        className="flex items-center space-x-2.5 bg-obsidian-950 hover:bg-obsidian-900 border border-obsidian-700 hover:border-cyan-500/50 rounded-lg px-3 py-1.5 text-xs font-mono text-white transition-all focus:outline-none focus:border-cyan-500 shadow"
+        className="flex items-center space-x-2 bg-[#0C1017] hover:bg-[#121824] border border-slate-700/80 hover:border-slate-500 rounded-sm px-2.5 py-1 text-xs font-mono text-white transition-all focus:outline-none focus:border-cyan-500 shadow-sm"
         data-testid="month-locked-date-trigger"
       >
         <Calendar className="w-3.5 h-3.5 text-cyan-400" />
-        <span className="font-semibold text-slate-100">{value}</span>
-        <span className="text-[10px] text-slate-500 uppercase px-1 py-0.5 rounded bg-obsidian-900 border border-obsidian-800">
+        <span className="font-semibold text-slate-100 tabular-nums">{value}</span>
+        <span className="text-[10px] text-slate-400 uppercase px-1 py-0.2 rounded-sm bg-[#161D2B] border border-slate-800">
           Jan '26
         </span>
       </button>
@@ -80,24 +80,24 @@ export const MonthLockedDatePicker: React.FC<MonthLockedDatePickerProps> = ({
         <div
           role="dialog"
           aria-modal="true"
-          className="absolute left-0 top-9 z-50 w-72 rounded-xl bg-obsidian-950/98 backdrop-blur-md border border-slate-700 shadow-2xl p-3.5 ring-1 ring-cyan-500/20"
+          className="absolute left-0 top-8 z-50 w-72 rounded-sm bg-[#0B0E14] border border-slate-700 shadow-2xl p-3 ring-1 ring-slate-800"
           data-testid="month-locked-calendar-popover"
         >
           {/* Locked Header */}
-          <div className="flex items-center justify-between pb-2.5 border-b border-obsidian-800">
+          <div className="flex items-center justify-between pb-2 border-b border-slate-800">
             <button
               type="button"
               disabled
               title="Navigation locked: historical evaluation scope is January 2026 only"
-              className="p-1 rounded text-slate-600 cursor-not-allowed opacity-40"
+              className="p-1 rounded-sm text-slate-600 cursor-not-allowed opacity-30"
               aria-label="Previous month disabled"
             >
-              <ChevronLeft className="w-4 h-4" />
+              <ChevronLeft className="w-3.5 h-3.5" />
             </button>
 
             <div className="flex items-center space-x-1.5">
               <Lock className="w-3 h-3 text-cyan-400" />
-              <span className="text-xs font-bold font-mono text-white tracking-wide">
+              <span className="text-xs font-bold font-mono text-white uppercase tracking-wider">
                 January 2026
               </span>
             </div>
@@ -106,14 +106,14 @@ export const MonthLockedDatePicker: React.FC<MonthLockedDatePickerProps> = ({
               type="button"
               disabled
               title="Navigation locked: historical evaluation scope is January 2026 only"
-              className="p-1 rounded text-slate-600 cursor-not-allowed opacity-40"
+              className="p-1 rounded-sm text-slate-600 cursor-not-allowed opacity-30"
               aria-label="Next month disabled"
             >
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="w-3.5 h-3.5" />
             </button>
           </div>
 
-          <div className="mt-2 text-[10px] font-mono text-cyan-400/80 text-center bg-cyan-950/40 border border-cyan-800/30 rounded py-0.5 mb-2.5">
+          <div className="mt-2 text-[10px] font-mono text-cyan-400/90 text-center bg-[#070A10] border border-cyan-900/40 rounded-sm py-0.5 mb-2">
             Scope constrained: Jan 1–31, 2026
           </div>
 
@@ -136,7 +136,7 @@ export const MonthLockedDatePicker: React.FC<MonthLockedDatePickerProps> = ({
                 disabled
                 tabIndex={-1}
                 aria-disabled="true"
-                className="h-7 text-xs font-mono text-slate-700 cursor-not-allowed rounded opacity-30 pointer-events-none"
+                className="h-6 text-xs font-mono text-slate-700 cursor-not-allowed rounded-sm opacity-25 pointer-events-none tabular-nums"
               >
                 {day}
               </button>
@@ -153,10 +153,10 @@ export const MonthLockedDatePicker: React.FC<MonthLockedDatePickerProps> = ({
                   aria-label={`Select January ${day}, 2026`}
                   aria-selected={isSelected}
                   data-testid={`calendar-day-${day}`}
-                  className={`h-7 text-xs font-mono rounded transition-all flex items-center justify-center font-medium ${
+                  className={`h-6 text-xs font-mono rounded-sm transition-all flex items-center justify-center font-medium tabular-nums ${
                     isSelected
-                      ? 'bg-cyan-500 text-obsidian-950 font-bold shadow-md shadow-cyan-500/30 ring-1 ring-cyan-300'
-                      : 'text-slate-200 hover:bg-obsidian-800 hover:text-cyan-300'
+                      ? 'bg-cyan-600 text-white font-bold shadow-sm ring-1 ring-cyan-400'
+                      : 'text-slate-300 hover:bg-[#161D2B] hover:text-white'
                   }`}
                 >
                   {day}

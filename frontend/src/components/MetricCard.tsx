@@ -12,48 +12,50 @@ interface MetricCardProps {
   badge?: string;
 }
 
-const variantStyles = {
+const variantStyles: Record<
+  string,
+  {
+    border: string;
+    text: string;
+    badge: string;
+    accent: string;
+  }
+> = {
   cyan: {
-    border: 'border-cyan-500/30 hover:border-cyan-500/60',
-    glow: 'from-cyan-500/10 to-transparent',
+    border: 'border-slate-800 hover:border-cyan-500/40',
     text: 'text-cyan-400',
-    badge: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40',
-    iconBg: 'bg-cyan-500/10 text-cyan-400',
+    badge: 'bg-cyan-950/60 text-cyan-300 border-cyan-800/50',
+    accent: 'bg-cyan-500',
   },
   emerald: {
-    border: 'border-emerald-500/30 hover:border-emerald-500/60',
-    glow: 'from-emerald-500/10 to-transparent',
+    border: 'border-slate-800 hover:border-emerald-500/40',
     text: 'text-emerald-400',
-    badge: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40',
-    iconBg: 'bg-emerald-500/10 text-emerald-400',
+    badge: 'bg-emerald-950/60 text-emerald-300 border-emerald-800/50',
+    accent: 'bg-emerald-500',
   },
   amber: {
-    border: 'border-amber-500/30 hover:border-amber-500/60',
-    glow: 'from-amber-500/10 to-transparent',
+    border: 'border-slate-800 hover:border-amber-500/40',
     text: 'text-amber-400',
-    badge: 'bg-amber-500/20 text-amber-300 border-amber-500/40',
-    iconBg: 'bg-amber-500/10 text-amber-400',
+    badge: 'bg-amber-950/60 text-amber-300 border-amber-800/50',
+    accent: 'bg-amber-500',
   },
   rose: {
-    border: 'border-rose-500/30 hover:border-rose-500/60',
-    glow: 'from-rose-500/10 to-transparent',
+    border: 'border-slate-800 hover:border-rose-500/40',
     text: 'text-rose-400',
-    badge: 'bg-rose-500/20 text-rose-300 border-rose-500/40',
-    iconBg: 'bg-rose-500/10 text-rose-400',
+    badge: 'bg-rose-950/60 text-rose-300 border-rose-800/50',
+    accent: 'bg-rose-500',
   },
   indigo: {
-    border: 'border-indigo-500/30 hover:border-indigo-500/60',
-    glow: 'from-indigo-500/10 to-transparent',
+    border: 'border-slate-800 hover:border-indigo-500/40',
     text: 'text-indigo-400',
-    badge: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/40',
-    iconBg: 'bg-indigo-500/10 text-indigo-400',
+    badge: 'bg-indigo-950/60 text-indigo-300 border-indigo-800/50',
+    accent: 'bg-indigo-500',
   },
   slate: {
-    border: 'border-slate-700/60 hover:border-slate-600',
-    glow: 'from-slate-700/10 to-transparent',
-    text: 'text-slate-200',
-    badge: 'bg-slate-800 text-slate-300 border-slate-700',
-    iconBg: 'bg-slate-800 text-slate-400',
+    border: 'border-slate-800 hover:border-slate-700',
+    text: 'text-slate-100',
+    badge: 'bg-slate-900 text-slate-300 border-slate-700',
+    accent: 'bg-slate-500',
   },
 };
 
@@ -63,7 +65,6 @@ export const MetricCard: React.FC<MetricCardProps> = ({
   unit,
   subtitle,
   formulaTooltip,
-  icon: Icon,
   variant = 'slate',
   badge,
 }) => {
@@ -95,29 +96,27 @@ export const MetricCard: React.FC<MetricCardProps> = ({
 
   return (
     <div
-      className={`relative overflow-visible rounded-xl bg-obsidian-900 border ${styles.border} p-4 transition-all duration-200 shadow-lg`}
+      className={`relative ${
+        showTooltip ? 'z-40' : 'z-0'
+      } overflow-visible rounded-md bg-obsidian-900 border ${
+        styles.border
+      } p-3 transition-colors shadow-sm`}
       data-testid={`metric-card-${title.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
     >
-      {/* Decorative Glow constrained to rounded corners without clipping tooltips */}
-      <div className="absolute inset-0 overflow-hidden rounded-xl pointer-events-none">
-        <div
-          className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl ${styles.glow} rounded-bl-full`}
-        />
-      </div>
+      {/* Subtle 2px Top Accent Border */}
+      <div className={`absolute top-0 left-0 right-0 h-[2px] ${styles.accent} opacity-70`} />
 
-      <div className="flex items-center justify-between mb-2 relative z-10">
-        <div className="flex items-center space-x-2">
-          {Icon && (
-            <div className={`p-1.5 rounded-lg ${styles.iconBg}`}>
-              <Icon className="w-4 h-4" />
-            </div>
-          )}
-          <span className="text-xs font-medium uppercase tracking-wider text-slate-400">{title}</span>
-        </div>
+      {/* Header Row: Title, Badge, and Info Button */}
+      <div className="flex items-center justify-between mb-1.5 relative z-10">
+        <span className="text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-400">
+          {title}
+        </span>
 
         <div className="flex items-center space-x-1.5">
           {badge && (
-            <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded border ${styles.badge}`}>
+            <span
+              className={`text-[9px] font-mono uppercase px-1 py-0.2 rounded border ${styles.badge}`}
+            >
               {badge}
             </span>
           )}
@@ -146,15 +145,21 @@ export const MetricCard: React.FC<MetricCardProps> = ({
               >
                 <HelpCircle className="w-3.5 h-3.5" />
               </button>
+
+              {/* 100% Solid Opaque Tooltip - Zero Transparency, Zero Bleed */}
               {showTooltip && (
                 <div
                   role="tooltip"
-                  className={`absolute ${placement === 'left' ? 'left-0' : 'right-0'} top-7 z-50 w-64 sm:w-72 max-w-[calc(100vw-2.5rem)] p-3 rounded-lg bg-obsidian-950/95 backdrop-blur-md border border-slate-700 shadow-2xl text-[11px] text-slate-200 font-mono leading-relaxed pointer-events-none ring-1 ring-cyan-500/20`}
+                  className={`absolute ${
+                    placement === 'left' ? 'left-0' : 'right-0'
+                  } top-7 z-50 w-64 sm:w-72 max-w-[calc(100vw-2.5rem)] p-3 rounded-md bg-[#0B0E14] border border-slate-700 shadow-2xl text-[11px] text-slate-200 font-mono leading-relaxed pointer-events-none ring-1 ring-cyan-500/20`}
                 >
-                  <div className="font-semibold text-cyan-400 mb-1 flex items-center space-x-1">
+                  <div className="font-semibold text-cyan-400 mb-1 flex items-center space-x-1 border-b border-slate-800 pb-1">
                     <span>Formula & Definition</span>
                   </div>
-                  {formulaTooltip}
+                  <div className="text-slate-300 mt-1">
+                    {formulaTooltip}
+                  </div>
                 </div>
               )}
             </div>
@@ -162,15 +167,21 @@ export const MetricCard: React.FC<MetricCardProps> = ({
         </div>
       </div>
 
-      <div className="flex items-baseline space-x-2 relative z-10">
-        <span className={`text-2xl font-bold font-mono tracking-tight ${styles.text}`}>
+      {/* Metric Numeric Value & Unit (Tabular Numerals) */}
+      <div className="flex items-baseline space-x-1.5 relative z-10">
+        <span
+          className={`text-xl font-bold font-mono tabular-nums tracking-tight ${styles.text}`}
+        >
           {typeof value === 'number' ? value.toLocaleString() : value}
         </span>
-        {unit && <span className="text-xs font-mono text-slate-400">{unit}</span>}
+        {unit && <span className="text-[10px] font-mono text-slate-400">{unit}</span>}
       </div>
 
+      {/* Subtitle / Context Note */}
       {subtitle && (
-        <p className="mt-1 text-xs text-slate-400 font-sans truncate relative z-10">{subtitle}</p>
+        <p className="mt-1 text-[10px] font-mono text-slate-400 truncate relative z-10">
+          {subtitle}
+        </p>
       )}
     </div>
   );
