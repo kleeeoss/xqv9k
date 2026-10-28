@@ -419,22 +419,32 @@ export const TradingDeskTab: React.FC<TradingDeskTabProps> = ({
                       fontSize: '12px',
                     }}
                   />
-                  {/* Uncertainty Band (between firm wind and upper band) */}
+                  {/* Uncertainty Prediction Interval Band (stacked on firm wind floor) */}
                   <Area
                     type="monotone"
-                    dataKey="upperBand"
+                    dataKey="firmWind"
+                    stackId="uncertaintyBand"
                     stroke="none"
-                    fill="#06B6D4"
-                    fillOpacity={0.08}
-                    name="Upper Prediction Bound"
+                    fill="transparent"
+                    legendType="none"
+                    tooltipType="none"
                   />
                   <Area
+                    type="monotone"
+                    dataKey="bandDelta"
+                    stackId="uncertaintyBand"
+                    stroke="none"
+                    fill="#06B6D4"
+                    fillOpacity={0.16}
+                    name="P10–P90 Prediction Interval"
+                  />
+                  <Line
                     type="monotone"
                     dataKey="firmWind"
                     stroke="#10B981"
                     strokeWidth={2}
                     strokeDasharray="4 4"
-                    fill="url(#fanGradient)"
+                    dot={false}
                     name="P90 Firm Wind Floor"
                   />
                   <Line

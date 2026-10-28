@@ -89,6 +89,11 @@ def compute_lead_time_hours(target_time_utc: str, publish_time_utc: str) -> floa
 class AlgorithmicEngine:
     def __init__(self, manager: Optional[ElexonDataManager] = None) -> None:
         self.manager = manager or data_manager
+        self._residuals_cache: Dict[Tuple[str, str, str], List[Dict[str, Any]]] = {}
+
+    def clear_cache(self) -> None:
+        """Clear the in-memory residual cache."""
+        self._residuals_cache.clear()
 
     def interpolate_forecast(
         self,
@@ -143,6 +148,9 @@ class AlgorithmicEngine:
         Scope 'delivery_jan': deliveries 2026-01-01 to 2026-01-31 (decisions Dec 31 to Jan 30).
         Scope 'decision_jan': decisions 2026-01-01 to 2026-01-31 (deliveries Jan 02 to Feb 01).
         """
+        cache_key = (scope, gate_closure, interpolation)
+        if cache_key in self._residuals_cache:
+            return self._residuals_cache[cache_key]
         if scope == "decision_jan":
             # Decisions Jan 1 to Jan 31 -> Deliveries Jan 2 to Feb 1
             start_date = datetime(2026, 1, 2)
@@ -190,6 +198,7 @@ class AlgorithmicEngine:
                         })
             curr += timedelta(days=1)
 
+        self._residuals_cache[cache_key] = aligned_records
         return aligned_records
 
     def compute_shortfall_quantiles(
@@ -549,20 +558,34 @@ class AlgorithmicEngine:
         )
 
     def generate_forecast_evolution(self, start_time_utc: str) -> ForecastEvolutionResponse:
-        """Return historical progression of all forecasts targeting `start_time_utc`."""
-        all_forecasts = self.manager.get_all_forecasts_for_target(start_time_utc)
-        actual = self.manager.get_actual_by_start_time(start_time_utc)
+        """Return historical progression of all forecasts targeting `start_time_utc`.
 
+        Strictly enforces point-in-time zero lookahead (rejecting runs published after target)
+        and supports both native hourly (:00) and interpolated half-hourly (:30) periods.
+        """
         # Parse settlement date and period from start_time_utc
         dt = datetime.fromisoformat(start_time_utc.replace("Z", "+00:00"))
         settlement_date = dt.strftime("%Y-%m-%d")
         sp = (dt.hour * 2) + (1 if dt.minute == 0 else 2)
 
+        actual = self.manager.get_actual_by_start_time(start_time_utc)
+        if actual is None:
+            actual = self.manager.get_actual_generation(settlement_date, sp)
+
         runs: List[EvolutionRunPoint] = []
-        for f in all_forecasts:
-            p_time = f["publishTime"]
-            f_mw = float(f["generation"])
+        for p_time in self.manager.unique_publish_times:
+            # Zero-lookahead invariant: no forecast published after delivery start time is eligible
+            if p_time > start_time_utc:
+                continue
+
+            f_mw = self.interpolate_forecast(p_time, start_time_utc, interpolation="linear")
+            if f_mw is None:
+                continue
+
             lead = compute_lead_time_hours(start_time_utc, p_time)
+            if lead < 0.0:
+                continue
+
             err = round(f_mw - actual, 1) if actual is not None else None
             shortfall = max(0.0, err) if err is not None else None
 

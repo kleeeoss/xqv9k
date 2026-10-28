@@ -55,6 +55,24 @@ def test_forecast_evolution_endpoint(client: TestClient):
     assert len(data["runs"]) > 0
 
 
+def test_forecast_evolution_half_hour_endpoint(client: TestClient):
+    """Verifies that drilldown on half-hourly settlement periods (e.g. Rank 3 SP 4) works via HTTP."""
+    r = client.get("/api/forecast-evolution?start_time=2026-01-12T01:30:00Z")
+    assert r.status_code == 200
+    data = r.json()
+    assert data["target_start_time_utc"] == "2026-01-12T01:30:00Z"
+    assert data["settlement_period"] == 4
+    assert len(data["runs"]) >= 10
+
+
+def test_live_verify_endpoint(client: TestClient):
+    r = client.get("/api/elexon/live-verify")
+    assert r.status_code == 200
+    data = r.json()
+    assert "status" in data
+    assert "latency_ms" in data
+
+
 def test_spa_root_serves_html(client: TestClient):
     r = client.get("/")
     assert r.status_code == 200

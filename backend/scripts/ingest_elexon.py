@@ -14,7 +14,7 @@ import os
 import sys
 import time
 import urllib.request
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Dict, List
 
@@ -91,7 +91,7 @@ def main() -> None:
     dataset = {
         "metadata": {
             "source": "Elexon BMRS API v1 (/datasets/FUELHH/stream & /datasets/WINDFOR/stream)",
-            "generated_utc": datetime.utcnow().isoformat() + "Z",
+            "generated_utc": datetime.now(timezone.utc).isoformat(),
             "fuelhh_record_count": len(fuelhh_records),
             "windfor_record_count": len(windfor_records),
             "date_range": {

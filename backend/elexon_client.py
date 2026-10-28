@@ -54,6 +54,18 @@ class ElexonDataManager:
 
     def load_data(self) -> None:
         if not self.data_path.exists():
+            fallback_candidates = [
+                Path.cwd() / "backend" / "data" / "elexon_jan2026.json",
+                Path("/var/task/backend/data/elexon_jan2026.json"),
+                Path.cwd() / "data" / "elexon_jan2026.json",
+                Path(__file__).resolve().parent.parent / "backend" / "data" / "elexon_jan2026.json",
+            ]
+            for candidate in fallback_candidates:
+                if candidate.exists():
+                    self.data_path = candidate
+                    break
+
+        if not self.data_path.exists():
             logger.warning("Dataset not found at %s. Attempting fallback...", self.data_path)
             return
 

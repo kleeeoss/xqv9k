@@ -259,10 +259,54 @@ class TestExtremeEventsAndEvolution:
         assert evolution.settlement_period == 39
         assert evolution.actual_mw is not None
         assert len(evolution.runs) >= 4  # multiple runs published leading up to delivery
+
+        # Strict zero-lookahead verification: NO future runs, NO negative lead times
+        for r in evolution.runs:
+            assert r.publish_time_utc <= target, f"Future run {r.publish_time_utc} leaked into evolution of {target}"
+            assert r.lead_time_hours >= 0.0, f"Negative lead time {r.lead_time_hours} for run {r.publish_time_utc}"
+
         # Verify runs are sorted chronologically
         for i in range(len(evolution.runs) - 1):
             assert evolution.runs[i].publish_time_utc <= evolution.runs[i + 1].publish_time_utc
             assert evolution.runs[i].lead_time_hours >= evolution.runs[i + 1].lead_time_hours
+
+    def test_forecast_evolution_half_hour_settlement_period(self, loaded_engine: AlgorithmicEngine):
+        """Verifies that half-hourly targets (:30, SP 46 & SP 4) properly interpolate and return runs."""
+        for target, expected_sp in [("2026-01-02T22:30:00Z", 46), ("2026-01-12T01:30:00Z", 4)]:
+            evolution = loaded_engine.generate_forecast_evolution(target)
+            assert evolution.target_start_time_utc == target
+            assert evolution.settlement_period == expected_sp
+            assert evolution.actual_mw is not None
+            assert len(evolution.runs) >= 10, f"Expected >=10 interpolated runs for {target}, got {len(evolution.runs)}"
+            for r in evolution.runs:
+                assert r.publish_time_utc <= target, f"Future run {r.publish_time_utc} leaked into {target}"
+                assert r.lead_time_hours >= 0.0, f"Negative lead time {r.lead_time_hours} for {target}"
+
+    def test_top_worst_shortfalls_all_have_valid_evolution(self, loaded_engine: AlgorithmicEngine):
+        """Verifies that clicking any row in the top 5 worst misses yields a valid non-empty evolution cone."""
+        audit = loaded_engine.generate_accuracy_audit_view()
+        assert len(audit.top_worst_shortfalls) == 5
+        for event in audit.top_worst_shortfalls:
+            evolution = loaded_engine.generate_forecast_evolution(event.start_time_utc)
+            assert len(evolution.runs) > 0, f"Rank {event.rank} ({event.start_time_utc}) returned 0 evolution runs"
+            assert evolution.actual_mw is not None
+
+    def test_caching_performance_and_sub_15ms_latency(self, loaded_engine: AlgorithmicEngine):
+        """Empirically verifies that cached trading desk views execute well under 15ms."""
+        import time
+
+        loaded_engine.clear_cache()
+        # Initial cold call populates cache
+        loaded_engine.generate_trading_desk_view("2026-01-02", "09:20", 0.90)
+
+        # Warm calls
+        t0 = time.time()
+        iterations = 20
+        for _ in range(iterations):
+            desk = loaded_engine.generate_trading_desk_view("2026-01-02", "09:20", 0.90)
+            assert len(desk.periods) == 48
+        avg_ms = ((time.time() - t0) / iterations) * 1000.0
+        assert avg_ms < 15.0, f"Expected <15ms average latency, got {avg_ms:.2f}ms"
 
     def test_confidence_level_monotonicity(self, loaded_engine: AlgorithmicEngine):
         """Higher confidence level alpha requires larger buffer, lowering firm wind."""
