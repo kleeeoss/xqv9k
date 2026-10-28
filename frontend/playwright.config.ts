@@ -21,7 +21,8 @@ export default defineConfig({
   ],
   webServer: [
     {
-      command: 'cd /home/thatguygarv/Projects/Python/xqv9k && .venv/bin/uvicorn backend.main:app --host 127.0.0.1 --port 8000',
+      command: 'if [ -f .venv/bin/python ]; then .venv/bin/python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000; else python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000; fi',
+      cwd: '..',
       port: 8000,
       reuseExistingServer: !process.env.CI,
       timeout: 30000,
