@@ -7,6 +7,7 @@ Elexon API verification.
 
 from __future__ import annotations
 
+from datetime import date
 import logging
 from pathlib import Path
 from typing import Optional
@@ -31,6 +32,10 @@ from backend.schemas import (
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger("gridbricks_api")
 
+# Historical January 2026 Evaluation Date Bounds
+MIN_JAN_2026_DATE = date(2026, 1, 1)
+MAX_JAN_2026_DATE = date(2026, 1, 31)
+
 app = FastAPI(
     title="Gridbricks UK Wholesale Day-Ahead Energy & Forecast Risk Terminal",
     description=(
@@ -52,6 +57,28 @@ app.add_middleware(
 )
 
 
+def validate_delivery_date(delivery_date: str) -> str:
+    """Validate that delivery_date conforms to YYYY-MM-DD and falls strictly in January 2026."""
+    try:
+        parsed_date = date.fromisoformat(delivery_date)
+    except (ValueError, TypeError):
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid delivery_date format '{delivery_date}'. Expected ISO format YYYY-MM-DD.",
+        )
+
+    if parsed_date < MIN_JAN_2026_DATE or parsed_date > MAX_JAN_2026_DATE:
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                f"Delivery date '{delivery_date}' is outside the historical evaluation scope. "
+                "Supported delivery dates are strictly January 1, 2026 to January 31, 2026."
+            ),
+        )
+
+    return delivery_date
+
+
 @app.get("/api/health", summary="API Health Check")
 def health_check() -> dict:
     return {
@@ -65,13 +92,14 @@ def health_check() -> dict:
 
 @app.get("/api/trading-desk", response_model=TradingDeskResponse, summary="Day-Ahead Trading Desk Forecast & Dispatch")
 def get_trading_desk(
-    delivery_date: str = Query("2026-01-02", description="Delivery date (YYYY-MM-DD), Jan 1 to Feb 1 2026"),
+    delivery_date: str = Query("2026-01-02", description="Delivery date (YYYY-MM-DD), strictly 2026-01-01 to 2026-01-31"),
     gate_closure: GateClosureEnum = Query(GateClosureEnum.EPEX_0920, description="Auction gate closure time UTC"),
     confidence_level: float = Query(0.90, ge=0.10, le=0.99, description="Shortfall VaR confidence level (0.50, 0.75, 0.90, 0.95)"),
     demand_mw: float = Query(22000.0, ge=5000.0, le=50000.0, description="Expected portfolio peak demand (MW)"),
     scope: ScopeEnum = Query(ScopeEnum.DELIVERY_JAN, description="Evaluation scope: delivery_jan or decision_jan"),
     interpolation: InterpolationEnum = Query(InterpolationEnum.LINEAR, description="Resolution mode: linear (48 SP) or exact (24 SP)"),
 ) -> TradingDeskResponse:
+    validate_delivery_date(delivery_date)
     try:
         return engine.generate_trading_desk_view(
             delivery_date=delivery_date,
@@ -81,6 +109,8 @@ def get_trading_desk(
             scope=scope.value,
             interpolation=interpolation.value,
         )
+    except HTTPException:
+        raise
     except Exception as exc:
         logger.exception("Error in trading-desk endpoint: %s", exc)
         raise HTTPException(status_code=500, detail=str(exc))
@@ -98,6 +128,8 @@ def get_accuracy_audit(
             scope=scope.value,
             interpolation=interpolation.value,
         )
+    except HTTPException:
+        raise
     except Exception as exc:
         logger.exception("Error in accuracy-audit endpoint: %s", exc)
         raise HTTPException(status_code=500, detail=str(exc))
@@ -109,6 +141,8 @@ def get_forecast_evolution(
 ) -> ForecastEvolutionResponse:
     try:
         return engine.generate_forecast_evolution(start_time_utc=start_time)
+    except HTTPException:
+        raise
     except Exception as exc:
         logger.exception("Error in forecast-evolution endpoint: %s", exc)
         raise HTTPException(status_code=500, detail=str(exc))

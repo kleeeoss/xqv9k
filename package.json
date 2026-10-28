@@ -5,6 +5,11 @@
   "description": "UK Day-Ahead Wholesale Power & Wind Forecast Risk Terminal",
   "scripts": {
     "build": "npm run build --prefix frontend",
-    "dev": "npm run dev --prefix frontend"
+    "dev": "npm run dev --prefix frontend",
+    "test": "bash scripts/run_all_tests.sh",
+    "test:all": "bash scripts/run_all_tests.sh",
+    "test:backend": "source .venv/bin/activate && pytest backend/tests/ -v",
+    "test:frontend": "npm test --prefix frontend",
+    "test:e2e": "npm run test:e2e --prefix frontend"
   }
 }

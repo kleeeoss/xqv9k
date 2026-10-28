@@ -30,6 +30,7 @@ import {
 } from '../types/api';
 import { fetchTradingDesk } from '../services/apiClient';
 import { MetricCard } from './MetricCard';
+import { MonthLockedDatePicker } from './MonthLockedDatePicker';
 
 interface TradingDeskTabProps {
   gateClosure: GateClosure;
@@ -59,6 +60,8 @@ export const TradingDeskTab: React.FC<TradingDeskTabProps> = ({
   const [data, setData] = useState<TradingDeskResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const pLabel = `P${Math.round(confidenceLevel * 100)}`;
 
   useEffect(() => {
     let isMounted = true;
@@ -96,7 +99,7 @@ export const TradingDeskTab: React.FC<TradingDeskTabProps> = ({
       'PublishTimeUsed',
       'LeadTimeHours',
       'ForecastMW',
-      'FirmWindMW',
+      `FirmWind_${pLabel}_MW`,
       'DemandMW',
       'NaiveThermalMW',
       'RecommendedThermalMW',
@@ -125,7 +128,7 @@ export const TradingDeskTab: React.FC<TradingDeskTabProps> = ({
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', `gridbricks_dispatch_${deliveryDate}_${gateClosure.replace(':', '')}.csv`);
+    link.setAttribute('download', `gridbricks_dispatch_${deliveryDate}_${pLabel}_${gateClosure.replace(':', '')}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -155,20 +158,16 @@ export const TradingDeskTab: React.FC<TradingDeskTabProps> = ({
       {/* Interactive Control Panel & Presets */}
       <div className="rounded-2xl bg-obsidian-900 border border-obsidian-700/80 p-4 lg:p-5 shadow-xl">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-          {/* Date Picker & Presets */}
+          {/* Month-Locked Date Picker & Presets */}
           <div className="space-y-2">
             <label className="text-xs font-mono font-semibold text-slate-400 uppercase tracking-wider flex items-center space-x-1.5">
               <Calendar className="w-3.5 h-3.5 text-cyan-400" />
-              <span>Delivery Date (January 2026)</span>
+              <span>Delivery Date (January 2026 Only)</span>
             </label>
             <div className="flex flex-wrap items-center gap-2">
-              <input
-                type="date"
-                min="2026-01-01"
-                max="2026-02-01"
+              <MonthLockedDatePicker
                 value={deliveryDate}
-                onChange={(e) => setDeliveryDate(e.target.value)}
-                className="bg-obsidian-950 border border-obsidian-700 rounded-lg px-3 py-1.5 text-xs font-mono text-white focus:outline-none focus:border-cyan-500 shadow"
+                onChange={(newDate) => setDeliveryDate(newDate)}
               />
               <div className="hidden sm:flex items-center space-x-1.5">
                 {PRESETS.map((p) => (
@@ -205,6 +204,7 @@ export const TradingDeskTab: React.FC<TradingDeskTabProps> = ({
                 <button
                   key={opt.val}
                   type="button"
+                  data-testid={`confidence-btn-${Math.round(opt.val * 100)}`}
                   onClick={() => setConfidenceLevel(opt.val)}
                   className={`px-2.5 py-1 text-xs font-mono rounded-md transition-all ${
                     confidenceLevel === opt.val
@@ -263,6 +263,7 @@ export const TradingDeskTab: React.FC<TradingDeskTabProps> = ({
                 type="button"
                 onClick={() => setShowActuals(!showActuals)}
                 className="flex items-center space-x-1 text-slate-300 hover:text-white"
+                data-testid="toggle-actuals-btn"
               >
                 {showActuals ? <Eye className="w-3.5 h-3.5 text-amber-400" /> : <EyeOff className="w-3.5 h-3.5 text-slate-500" />}
                 <span>{showActuals ? 'Hide Outturn' : 'Show Outturn'}</span>
@@ -271,6 +272,7 @@ export const TradingDeskTab: React.FC<TradingDeskTabProps> = ({
                 type="button"
                 onClick={handleExportCSV}
                 className="flex items-center space-x-1 px-2.5 py-1 rounded bg-obsidian-950 border border-obsidian-700 text-slate-300 hover:text-white hover:border-slate-500 shadow"
+                data-testid="export-csv-btn"
               >
                 <Download className="w-3.5 h-3.5" />
                 <span>Export CSV</span>
@@ -282,13 +284,13 @@ export const TradingDeskTab: React.FC<TradingDeskTabProps> = ({
 
       {/* Loading or Error State */}
       {loading && (
-        <div className="p-12 text-center font-mono text-cyan-400 animate-pulse">
+        <div className="p-12 text-center font-mono text-cyan-400 animate-pulse" data-testid="loading-state">
           Evaluating Day-Ahead Causality & Shortfall Quantiles...
         </div>
       )}
 
       {error && (
-        <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 flex items-center space-x-2">
+        <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 flex items-center space-x-2" data-testid="error-state">
           <AlertTriangle className="w-5 h-5 flex-shrink-0" />
           <span>{error}</span>
         </div>
@@ -308,13 +310,14 @@ export const TradingDeskTab: React.FC<TradingDeskTabProps> = ({
               icon={Wind}
             />
             <MetricCard
-              title="Firm Wind (P90)"
+              title={`Firm Wind (${pLabel})`}
               value={data.kpis.firm_wind_energy_mwh}
               unit="MWh"
-              subtitle="Shortfall-hedged floor"
-              formulaTooltip="W_firm = max(0, W_hat - Q_alpha(S)). Represents guaranteed renewable floor at confidence alpha."
+              subtitle={`${pLabel} Renewable Floor`}
+              formulaTooltip={`W_firm = max(0, W_hat - Q_${Math.round(confidenceLevel * 100)}(S)). Represents guaranteed renewable floor at ${Math.round(confidenceLevel * 100)}% empirical confidence.`}
               variant="emerald"
               icon={Shield}
+              badge={pLabel}
             />
             <MetricCard
               title="Total Demand"
@@ -338,10 +341,11 @@ export const TradingDeskTab: React.FC<TradingDeskTabProps> = ({
               title="Rec. Thermal"
               value={data.kpis.recommended_thermal_mwh}
               unit="MWh"
-              subtitle="Firm-wind dispatched"
+              subtitle={`Hedged at ${pLabel}`}
               formulaTooltip="P_rec = max(0, D - W_firm). Dispatched thermal power ensuring firm demand coverage."
               variant="rose"
               icon={Flame}
+              badge={pLabel}
             />
             <MetricCard
               title="Savings Hedged"
@@ -367,7 +371,7 @@ export const TradingDeskTab: React.FC<TradingDeskTabProps> = ({
                   <span>Forecast Uncertainty Fan Chart (Delivery Day {data.delivery_date})</span>
                 </h3>
                 <p className="text-xs text-slate-400 font-sans mt-0.5">
-                  Point-in-Time NGESO Forecast vs Empirical Firm Wind Floor and Actual Outturn
+                  Point-in-Time NGESO Forecast vs Empirical {pLabel} Firm Wind Floor and Actual Outturn
                 </p>
               </div>
               <div className="flex items-center space-x-3 text-xs font-mono">
@@ -377,7 +381,7 @@ export const TradingDeskTab: React.FC<TradingDeskTabProps> = ({
                 </span>
                 <span className="flex items-center space-x-1.5">
                   <span className="w-3 h-1 bg-emerald-400 rounded-full border border-dashed" />
-                  <span className="text-slate-300">P90 Firm Wind</span>
+                  <span className="text-slate-300">{pLabel} Firm Wind</span>
                 </span>
                 {showActuals && (
                   <span className="flex items-center space-x-1.5">
@@ -436,7 +440,7 @@ export const TradingDeskTab: React.FC<TradingDeskTabProps> = ({
                     stroke="none"
                     fill="#06B6D4"
                     fillOpacity={0.16}
-                    name="P10–P90 Prediction Interval"
+                    name="Empirical P10–P90 Prediction Interval"
                   />
                   <Line
                     type="monotone"
@@ -445,7 +449,7 @@ export const TradingDeskTab: React.FC<TradingDeskTabProps> = ({
                     strokeWidth={2}
                     strokeDasharray="4 4"
                     dot={false}
-                    name="P90 Firm Wind Floor"
+                    name={`${pLabel} Firm Wind Floor`}
                   />
                   <Line
                     type="monotone"
@@ -479,13 +483,13 @@ export const TradingDeskTab: React.FC<TradingDeskTabProps> = ({
                   <span>Risk-Adjusted Day-Ahead Thermal Procurement Dispatch</span>
                 </h3>
                 <p className="text-xs text-slate-400 font-sans mt-0.5">
-                  How Expected Consumer Demand is balanced across Firm Wind, Naive Thermal, and Reserve Buffer
+                  How Expected Consumer Demand is balanced across {pLabel} Firm Wind, Naive Thermal, and Reserve Buffer
                 </p>
               </div>
               <div className="flex items-center space-x-3 text-xs font-mono">
                 <span className="flex items-center space-x-1.5">
                   <span className="w-3 h-2 bg-emerald-500 rounded-sm" />
-                  <span className="text-slate-300">Firm Wind</span>
+                  <span className="text-slate-300">{pLabel} Firm Wind</span>
                 </span>
                 <span className="flex items-center space-x-1.5">
                   <span className="w-3 h-2 bg-slate-600 rounded-sm" />
@@ -493,7 +497,7 @@ export const TradingDeskTab: React.FC<TradingDeskTabProps> = ({
                 </span>
                 <span className="flex items-center space-x-1.5">
                   <span className="w-3 h-2 bg-rose-500 rounded-sm" />
-                  <span className="text-slate-300">Risk Buffer Delta_P</span>
+                  <span className="text-slate-300">Reserve Buffer Delta_P</span>
                 </span>
               </div>
             </div>
@@ -529,7 +533,7 @@ export const TradingDeskTab: React.FC<TradingDeskTabProps> = ({
                     stroke="#10B981"
                     fill="#10B981"
                     fillOpacity={0.6}
-                    name="Firm Wind MW"
+                    name={`${pLabel} Firm Wind MW`}
                   />
                   <Area
                     type="monotone"
@@ -570,7 +574,7 @@ export const TradingDeskTab: React.FC<TradingDeskTabProps> = ({
                   48 Settlement Period Procurement Schedule
                 </h3>
                 <p className="text-xs text-slate-400 font-sans mt-0.5">
-                  Settlement breakdown with point-in-time causality, risk buffers, and ex-post outturns
+                  Settlement breakdown with point-in-time causality, {pLabel} risk buffers, and ex-post outturns
                 </p>
               </div>
               <button
@@ -590,7 +594,7 @@ export const TradingDeskTab: React.FC<TradingDeskTabProps> = ({
                     <th className="px-3 py-2.5">SP</th>
                     <th className="px-3 py-2.5">Start Time</th>
                     <th className="px-3 py-2.5 text-right">Forecast (MW)</th>
-                    <th className="px-3 py-2.5 text-right">Firm Wind (MW)</th>
+                    <th className="px-3 py-2.5 text-right">{pLabel} Firm Wind (MW)</th>
                     <th className="px-3 py-2.5 text-right">Demand (MW)</th>
                     <th className="px-3 py-2.5 text-right">Base Thermal</th>
                     <th className="px-3 py-2.5 text-right">Buffer Delta_P</th>

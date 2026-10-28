@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { HelpCircle, LucideIcon } from 'lucide-react';
 
 interface MetricCardProps {
@@ -67,16 +67,45 @@ export const MetricCard: React.FC<MetricCardProps> = ({
   variant = 'slate',
   badge,
 }) => {
-  const [showTooltip, setShowTooltip] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const [isPinned, setIsPinned] = useState(false);
+  const [placement, setPlacement] = useState<'left' | 'right'>('right');
+  const tooltipRef = useRef<HTMLDivElement>(null);
   const styles = variantStyles[variant];
+
+  const updatePlacement = () => {
+    if (tooltipRef.current && typeof window !== 'undefined') {
+      const rect = tooltipRef.current.getBoundingClientRect();
+      setPlacement(rect.left < window.innerWidth / 2 ? 'left' : 'right');
+    }
+  };
+
+  useEffect(() => {
+    if (!isPinned) return;
+    const handleOutside = (e: MouseEvent) => {
+      if (tooltipRef.current && !tooltipRef.current.contains(e.target as Node)) {
+        setIsPinned(false);
+      }
+    };
+    document.addEventListener('mousedown', handleOutside);
+    return () => document.removeEventListener('mousedown', handleOutside);
+  }, [isPinned]);
+
+  const showTooltip = isHovered || isPinned;
 
   return (
     <div
-      className={`relative overflow-hidden rounded-xl bg-obsidian-900 border ${styles.border} p-4 transition-all duration-200 shadow-lg`}
+      className={`relative overflow-visible rounded-xl bg-obsidian-900 border ${styles.border} p-4 transition-all duration-200 shadow-lg`}
+      data-testid={`metric-card-${title.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
     >
-      <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl ${styles.glow} pointer-events-none rounded-bl-full`} />
+      {/* Decorative Glow constrained to rounded corners without clipping tooltips */}
+      <div className="absolute inset-0 overflow-hidden rounded-xl pointer-events-none">
+        <div
+          className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl ${styles.glow} rounded-bl-full`}
+        />
+      </div>
 
-      <div className="flex items-center justify-between mb-2">
+      <div className="flex items-center justify-between mb-2 relative z-10">
         <div className="flex items-center space-x-2">
           {Icon && (
             <div className={`p-1.5 rounded-lg ${styles.iconBg}`}>
@@ -93,18 +122,38 @@ export const MetricCard: React.FC<MetricCardProps> = ({
             </span>
           )}
           {formulaTooltip && (
-            <div className="relative">
+            <div className="relative" ref={tooltipRef}>
               <button
                 type="button"
-                className="text-slate-500 hover:text-slate-300 transition-colors p-0.5"
-                onMouseEnter={() => setShowTooltip(true)}
-                onMouseLeave={() => setShowTooltip(false)}
-                onClick={() => setShowTooltip(!showTooltip)}
+                data-testid="metric-card-info-button"
+                aria-label={`Formula details for ${title}`}
+                className="text-slate-500 hover:text-slate-300 transition-colors p-0.5 focus:outline-none focus:text-cyan-400"
+                onMouseEnter={() => {
+                  updatePlacement();
+                  setIsHovered(true);
+                }}
+                onMouseLeave={() => setIsHovered(false)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  updatePlacement();
+                  setIsPinned((prev) => !prev);
+                }}
+                onFocus={() => {
+                  updatePlacement();
+                  setIsHovered(true);
+                }}
+                onBlur={() => setIsHovered(false)}
               >
                 <HelpCircle className="w-3.5 h-3.5" />
               </button>
               {showTooltip && (
-                <div className="absolute right-0 top-6 z-50 w-64 p-2.5 rounded-lg bg-obsidian-800 border border-slate-700 shadow-xl text-[11px] text-slate-300 font-mono leading-relaxed pointer-events-none">
+                <div
+                  role="tooltip"
+                  className={`absolute ${placement === 'left' ? 'left-0' : 'right-0'} top-7 z-50 w-64 sm:w-72 max-w-[calc(100vw-2.5rem)] p-3 rounded-lg bg-obsidian-950/95 backdrop-blur-md border border-slate-700 shadow-2xl text-[11px] text-slate-200 font-mono leading-relaxed pointer-events-none ring-1 ring-cyan-500/20`}
+                >
+                  <div className="font-semibold text-cyan-400 mb-1 flex items-center space-x-1">
+                    <span>Formula & Definition</span>
+                  </div>
                   {formulaTooltip}
                 </div>
               )}
@@ -113,7 +162,7 @@ export const MetricCard: React.FC<MetricCardProps> = ({
         </div>
       </div>
 
-      <div className="flex items-baseline space-x-2">
+      <div className="flex items-baseline space-x-2 relative z-10">
         <span className={`text-2xl font-bold font-mono tracking-tight ${styles.text}`}>
           {typeof value === 'number' ? value.toLocaleString() : value}
         </span>
@@ -121,7 +170,7 @@ export const MetricCard: React.FC<MetricCardProps> = ({
       </div>
 
       {subtitle && (
-        <p className="mt-1 text-xs text-slate-400 font-sans truncate">{subtitle}</p>
+        <p className="mt-1 text-xs text-slate-400 font-sans truncate relative z-10">{subtitle}</p>
       )}
     </div>
   );

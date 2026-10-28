@@ -1,0 +1,30 @@
+name: External Elexon & Live Deployment Probe
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Optional scheduled probe at 06:00 UTC daily
+    - cron: '0 6 * * *'
+
+jobs:
+  probe-live-elexon:
+    name: Probe Upstream Elexon BMRS API & Live Vercel Deployment
+    runs-on: ubuntu-latest
+    steps:
+      - name: Probe Live Deployment Health
+        run: |
+          echo "Pinging Live Vercel Production Health..."
+          curl -f -s -i "https://xqv9k.vercel.app/api/health" | head -n 15
+
+      - name: Probe Live Elexon BMRS Connectivity Endpoint
+        run: |
+          echo "Pinging /api/elexon/live-verify on live deployment..."
+          RESPONSE=$(curl -s "https://xqv9k.vercel.app/api/elexon/live-verify")
+          echo "Response: $RESPONSE"
+          
+          IS_LIVE=$(echo "$RESPONSE" | grep -o '"is_live":true' || true)
+          if [ -n "$IS_LIVE" ]; then
+            echo "✓ Elexon BMRS Upstream Stream Verified Online"
+          else
+            echo "⚠ Elexon BMRS Upstream Stream returned non-live status or degraded latency"
+          fi
