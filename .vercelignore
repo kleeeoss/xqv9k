@@ -1,0 +1,15 @@
+.venv
+.venv/
+node_modules
+node_modules/
+frontend/node_modules
+frontend/node_modules/
+.pytest_cache
+.pytest_cache/
+__pycache__
+__pycache__/
+*.pyc
+.git
+.git/
+Dockerfile
+docker-compose.yml
